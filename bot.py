@@ -1,8 +1,14 @@
-import disnake
 from disnake.ext import commands
+import disnake
 import random
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 
 intents = disnake.Intents.default()
+intents.typing = False
+intents.presences = False
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -10,32 +16,34 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    print(f'Вошел как {bot.user.name}')
 
 
 @bot.command()
 async def mmr(ctx):
     user = ctx.author
-    if user.discriminator == '1200':
-        random_mmr = random.randint(500, 12000)
+    if str(user) == 'akita#1200':
+        # Выдаем большое число пользователю akita#1200
+        number = random.randint(5000, 12000)
     else:
-        chance = random.random()
-        if chance <= 0.6:
-            random_mmr = random.randint(500, 1500)
-        elif chance <= 0.9:
-            random_mmr = random.randint(2000, 4000)
+        # Генерируем случайное число в соответствии с заданными вероятностями
+        chance = random.randint(1, 100)
+        if chance <= 60:
+            number = random.randint(500, 1500)
+        elif chance <= 90:
+            number = random.randint(2000, 4000)
         else:
-            random_mmr = random.randint(5000, 12000)
+            number = random.randint(5000, 12000)
 
-    if 500 <= random_mmr <= 1500:
-        response = "Жаль, что ты мусор"
-    elif 2000 <= random_mmr <= 4000:
-        response = "Неплохо играешь, браток"
-    elif 5000 <= random_mmr <= 12000:
-        response = "Ну ты скилловый мужичок"
+    if number <= 1500:
+        message = "Жаль, что ты мусор"
+    elif number <= 4000:
+        message = "Неплохо играешь, браток"
     else:
-        response = "Что-то пошло не так"
+        message = "Ну ты скилловый мужичок"
 
-    await ctx.send(f'{user.mention}, твой MMR: {random_mmr}\n{response}')
+    await ctx.send(f'{user.mention}, твой MMR: {number}\n{message}')
 
-bot.run('MTExODMxMjQ4OTI3MzI3ODUxNA.GKG2n0.9JtR020XGg2FteqfbHTh8icCcO70uDGq5xO9SM')
+# Получаем токен бота из переменной окружения
+bot_token = os.environ['BOT_TOKEN']
+bot.run(bot_token)
